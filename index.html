@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B站视频纯净观看</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .player-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 比例 */
+            height: 0;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .player-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #fb7299;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .instructions {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>B站视频纯净观看</h1>
+        
+        <div class="instructions">
+            <h3>使用说明：</h3>
+            <p>1. 在下方输入B站视频的BV号或完整链接（如 BV1a1JFznETh 或 https://www.bilibili.com/video/BV1a1JFznETh）</p>
+            <p>2. 点击"播放"按钮即可观看</p>
+            <p>3. 或者直接分享此页面的URL并在后面添加 <code>?bv=BV号</code> 参数</p>
+        </div>
+        
+        <div class="input-group">
+            <input type="text" id="videoInput" placeholder="输入B站视频BV号或链接">
+            <button onclick="loadVideo()">播放</button>
+        </div>
+        
+        <div class="player-container">
+            <iframe id="biliPlayer" src="" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // 从URL参数获取BV号
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // 从输入中提取BV号
+        function extractBv(input) {
+            // 如果是URL形式
+            if (input.includes("bilibili.com")) {
+                const match = input.match(/BV[a-zA-Z0-9]+/);
+                return match ? match[0] : null;
+            }
+            // 如果是纯BV号
+            if (input.startsWith("BV")) {
+                return input;
+            }
+            return null;
+        }
+
+        // 加载视频
+        function loadVideo(inputBv = null) {
+            let bv = inputBv;
+            
+            if (!bv) {
+                const userInput = document.getElementById("videoInput").value.trim();
+                bv = extractBv(userInput);
+            }
+            
+            if (bv) {
+                const iframe = document.getElementById("biliPlayer");
+                iframe.src = `//player.bilibili.com/player.html?isOutside=true&bvid=${bv}&p=1`;
+                
+                // 更新URL而不刷新页面
+                history.pushState(null, null, `?bv=${bv}`);
+            } else {
+                alert("请输入有效的B站视频BV号或链接！");
+            }
+        }
+
+        // 页面加载时检查URL参数
+        window.onload = function() {
+            const bvParam = getQueryParam("bv");
+            if (bvParam) {
+                document.getElementById("videoInput").value = bvParam;
+                loadVideo(bvParam);
+            }
+        };
+    </script>
+</body>
+</html>
